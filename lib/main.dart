@@ -1,14 +1,35 @@
 
 
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:simple3d/simple3d.dart';
 
 import 'dart:ui';
 
+import 'package:vector_math/vector_math_geometry.dart';
+import 'package:vector_math/vector_math_lists.dart';
+
+var aSphere;
 
 main() {
+
+
+  //MeshGeometry sphere = SphereGenerator().createSphere(2);;
+
+  MeshGeometry sphere = CylinderGenerator().createCylinder(2, 2, 3);
+
+  var q = sphere.getViewForAttrib('POSITION');
+  final viewStride = sphere.stride ~/ sphere.buffer.elementSizeInBytes;
+  Vector3List vert = Vector3List.view(sphere.buffer, 0,viewStride);
+  Uint32List colors = Uint32List(sphere.indices!.length ~/ 3);
+
+  for(int i = 0; i< colors.length; i++) {
+    colors[i] = i % 2 == 0 ?  0xFFFF0000 : 0xFF00FF00;
+  }
+
+  aSphere = VertexModel(vert, sphere.indices!, colors);
   runApp(MyApp());
 }
 
@@ -57,16 +78,16 @@ class World {
   }
 
   VertexModelInstance w  = VertexModelInstance();
-  View3d view0 = View3d(100, 100, 100);
-  View3d view2 = View3d(100, 100, 100);
+  View3d view0 = View3d(10000, 100, 100);
+  View3d view2 = View3d(10000, 100, 100);
 
-  View3d view3 = View3d(100, 100, 100);
-  View3d view4 = View3d(100, 100, 100);
+  View3d view3 = View3d(10000, 100, 100);
+  View3d view4 = View3d(10000, 100, 100);
 
 
   double t = 0;
   void render(double dt, Canvas canvas, Size size) {
-    w.model = aGem;
+    w.model = aSphere;
 
 
     view0.dimensions.x =  size.width/2;
